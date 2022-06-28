@@ -1,9 +1,11 @@
-# 🦓 Arbimz
-> 🦓 RCE in Zimbra Collaboration 8.7.X < 8.7.11p10
+# 🕵️ Arbimz
+> 🕵️ XXE in Zimbra Collaboration 8.7.X < 8.7.11p10
 
 <div align="center">
     <img src="./assets/banner.png">
 </div>
+
+<br>
 
 <p align="center">
     <img src="https://img.shields.io/github/license/oppsec/Arbimz?color=purple&logo=github&logoColor=purple&style=for-the-badge">
@@ -15,7 +17,12 @@
 
 <br><br>
 
-## ⚡ Installing / Getting started
+### 🕵️ What is Arbimz?
+🕵️ **Arbimz** is a python tool created to exploit the vulnerability defined as CVE-2019-9670 (XXE in Zimbra Collaboration 8.7.X < 8.7.11p10)
+
+<br><br>
+
+### ⚡ Installing / Getting started
 
 A quick guide of how to install and use Arbimz.
 
