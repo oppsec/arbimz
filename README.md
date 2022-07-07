@@ -15,12 +15,14 @@
     <img src="https://img.shields.io/github/languages/code-size/oppsec/Arbimz?color=purple&logo=github&logoColor=purple&style=for-the-badge">
 </p>
 
-<br><br>
+___
+
+<br>
 
 ### 🕵️ What is Arbimz?
 🕵️ **Arbimz** is a python tool created to exploit the vulnerability defined as CVE-2019-9670 (XXE in Zimbra Collaboration 8.7.X < 8.7.11p10)
 
-<br><br>
+<br>
 
 ### ⚡ Installing / Getting started
 
