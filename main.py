@@ -9,6 +9,7 @@ def initializer() -> None:
     parser.add_argument('--url', type=str, metavar="u", help="Argument used to pass target URL")
     parser.add_argument('--cmd', type=str, metavar="c", default="whoami", help="Argument used to indicate command to execute in target | default: whoami")
     # parser.add_argument('--file', type=str, metavar='f', help="Argument used to indicate a file with a URLs list")
+    parser.add_argument('--kc', type=str, metavar="kc", help="Argument to pass if you already know the Zimbra credentials (admin:admin)")
     args = parser.parse_args()
 
     host_is_alive(args)
