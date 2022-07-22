@@ -55,7 +55,7 @@ A quick guide of how to install and use Arbimz.
 A quick guide of how to contribute with the project.
 
 ```shell
-1. Create a fork from Zebra repository.
+1. Create a fork from Arbimz repository.
 2. Download the project with git clone https://github.com/your/arbimz.git
 3. cd arbimz/
 4. Make your changes.
